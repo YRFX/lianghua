@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 # 模块2：数据预处理层 - 仅负责：清洗脏数据 + 计算技术指标，纯数据处理
-import talib as ta
+import pandas_ta as ta
 import pandas as pd
 import numpy as np
-from config.settings import STRATEGY_CONFIG
-from utils.common_utils import print_error
+from lianghua.config.settings import STRATEGY_CONFIG
+# from lianghua.utils.common_utils import print_error
 
 
 def data_clean(raw_data):
@@ -16,7 +16,7 @@ def data_clean(raw_data):
     price_cols = ["open", "close", "high", "low"]
 
     # 1. 去重+时间排序
-    df = df.drop_duplicates(subset=["datetime"]).sort_values("datetime").reset_index(drop=True)
+    df = df.drop_duplicates(subset=["trade_time"]).sort_values("trade_time").reset_index(drop=True)
     # 2. 缺失值填充
     df[price_cols] = df[price_cols].fillna(method="ffill")
     df["vol"] = df["vol"].fillna(0)
@@ -24,8 +24,8 @@ def data_clean(raw_data):
     df["pct_chg"] = df["close"].pct_change() * 100
     df = df[(df["pct_chg"] > -5) & (df["pct_chg"] < 5)]
     # 4. 分钟级时间对齐
-    df["datetime"] = pd.to_datetime(df["datetime"])
-    df = df.set_index("datetime").asfreq("1min").reset_index()
+    df["trade_time"] = pd.to_datetime(df["trade_time"])
+    df = df.set_index("trade_time").asfreq("1min").reset_index()
     df[price_cols] = df["price_cols"].fillna(method="ffill")
 
     return df
@@ -68,3 +68,8 @@ def preprocess_data(raw_data):
     clean_df = data_clean(raw_data)
     processed_df = calc_technical_indicators(clean_df)
     return processed_df
+
+if __name__ == '__main__':
+    from data_collector import load_data
+    df = load_data("backtest")
+    preprocess_data(df)

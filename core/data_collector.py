@@ -1,25 +1,27 @@
 # -*- coding: utf-8 -*-
 # 模块1：行情数据采集层 - 仅负责：实盘实时采集/回测历史采集，无其他逻辑
+import traceback
+
 import tushare as ts
 import threading
 import time
-from config.settings import BASE_CONFIG, REAL_TIME_DATA, MIN1_DATA
-from utils.common_utils import print_info, print_error
+from lianghua.config.settings import  BASE_CONFIG, REAL_TIME_DATA, MIN1_DATA
+from lianghua.utils.common_utils import print_info, print_error
 
 # Tushare Token 配置【必填，替换成你的】
-ts.set_token("你的Tushare_Token_Here")
+ts.set_token("10119dd85c4a960217364adfaa05ed4f6351cb514e54e0a1c18232da")
 pro = ts.pro_api()
 
 def collect_history_data(start_date: str, end_date: str, freq: str = "1min"):
     """回测专用：采集股票历史1分钟K线数据"""
     try:
-        df = pro.bar(ts_code=BASE_CONFIG["target_stock"], start_date=start_date, end_date=end_date, freq=freq)
-        df = df.sort_values("datetime").reset_index(drop=True)
-        df = df.drop_duplicates(subset=["datetime"])
+        df = pro.stk_mins(ts_code=BASE_CONFIG["target_stock"], start_date=start_date, end_date=end_date, freq=freq)
+        df = df.sort_values("trade_time").reset_index(drop=True)
         df.to_csv(f"{BASE_CONFIG['data_save_path']}{BASE_CONFIG['target_stock']}_{freq}_{start_date}_{end_date}.csv", index=False)
         print_info(f"历史数据采集完成：{BASE_CONFIG['target_stock']} {start_date}-{end_date}")
         return df
     except Exception as e:
+        traceback.print_exc()
         print_error(f"历史数据采集失败: {str(e)}")
         return None
 
@@ -39,7 +41,7 @@ def collect_real_time_data():
 def load_data(mode: str = "real"):
     """数据加载统一入口：切换实盘/回测"""
     if mode == "backtest":
-        return collect_history_data("20260101", "20260110")
+        return collect_history_data("2026-02-13 09:00:00", "2026-02-13 19:00:00")
     elif mode == "real":
         # 启动实时采集守护线程
         t = threading.Thread(target=collect_real_time_data)
@@ -50,3 +52,5 @@ def load_data(mode: str = "real"):
     else:
         print_error("数据加载模式错误，仅支持 real / backtest")
         return None
+if __name__ == '__main__':
+    load_data("backtest")

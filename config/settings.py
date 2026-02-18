@@ -4,12 +4,12 @@ import pandas as pd
 
 # ========== 基础配置 ==========
 BASE_CONFIG = {
-    "target_stock": "600000.SH",    # 做T标的股票代码
+    "target_stock": "603086.SH",    # 做T标的股票代码
     "base_position": 1000,          # 底仓持股数量（固定不变）
     "base_hold_cost": 10.00,        # 底仓持仓成本价
     "current_cash": 100000.00,      # 可用资金(元)
     "data_save_path": "./data/",    # 历史数据存储路径
-    "log_save_path": "./log/t_log.log",  # 交易日志存储路径
+    "log_save_path": "../log/t_log.log",  # 交易日志存储路径
     "trade_mode": "semi_auto",      # 交易模式：semi_auto(推荐)/full_auto
     "market_risk_pct": 0.02,        # 大盘涨跌幅≥2%触发风控
     "avoid_end_trade": 1430,        # 14:30后只平仓不开新仓
