@@ -3,7 +3,7 @@
 import time
 import logging
 from datetime import datetime
-from lianghua.config.settings import BASE_CONFIG
+from config.settings import BASE_CONFIG
 
 # 日志初始化 - 全局生效
 logging.basicConfig(
