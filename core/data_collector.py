@@ -45,7 +45,7 @@ def collect_real_time_data(target_code):
     # while True:
     try:
         df = ak.stock_zh_a_minute(target_code)
-        df=df.sort_values("day").reset_index(drop=False)
+        df=df.sort_values(by="day")
         # MIN1_DATA = pro.bar(ts_code=BASE_CONFIG["target_stock"], freq="1min", count=1)
         # time.sleep(60)  # 严格匹配1分钟K线更新频率
         return df
